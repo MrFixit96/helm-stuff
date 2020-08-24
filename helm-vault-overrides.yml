@@ -15,8 +15,6 @@ global:
          cpu: 250m
   
   server:
-    # These Resource Limits are in line with node requirements in the 
-    # Vault Reference Architecture for a Small Cluster
     resources:
       requests:
         memory: 4Gi
@@ -25,26 +23,19 @@ global:
         memory: 8Gi
         cpu: 2000m
 
-    # For HA configuration and because we need to manually init the vault,
-    # we need to define custom readiness/liveness Probe settings
     readinessProbe:
       enabled: true
-      path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+      path: "/v1/sys/health?perfstandbyok=true&sealedcode=204&uninitcode=204"
     livenessProbe:
       enabled: true
-      path: "/v1/sys/health?standbyok=true"
+      path: "/v1/sys/health?perfstandbyok=true"
       initialDelaySeconds: 60
   
-    # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
-    # used to include variables required for auto-unseal.
     extraEnvironmentVars:
        GOOGLE_REGION: global
        GOOGLE_PROJECT: my-project
        GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/kms-creds/credentials.json
   
-    # extraVolumes is a list of extra volumes to mount. These will be exposed
-    # to Vault in the path `/vault/userconfig/<name>/`. The value below is
-    # an array of objects, examples are shown below.
     extraVolumes: 
       - type: secret
         name: tls-server
@@ -53,19 +44,12 @@ global:
       - type: secret
         name: kms-creds
 
-    # This configures the Vault Statefulset to create a PVC for audit
-    # logs.  Once Vault is deployed, initialized and unseal, Vault must
-    # be configured to use this for audit logs.  This will be mounted to
-    # /vault/audit
-    # See https://www.vaultproject.io/docs/audit/index.html to know more
     auditStorage:
       enabled: true
  
     standalone:
       enabled: false
   
-    # Run Vault in "HA" mode. There are no storage requirements unless audit log
-    # persistence or Integrated Storage is required.
     ha:
       enabled: true
       replicas: 5
@@ -119,7 +103,7 @@ global:
           
           seal "gcpckms" {
             credentials = "/vault/userconfig/kms-creds/credentials.json"            
-            project     = "jca-tfe-testing-1da3236b"
+            project     = "my-project"
             region      = "global"
             key_ring    = "vault-helm-unseal-kr"
             crypto_key  = "vault-helm-unseal-key"
@@ -127,12 +111,11 @@ global:
           
           service_registration "kubernetes" {}        
      
-  # Vault UI
   ui:
     enabled: true
     serviceType: "LoadBalancer"
     serviceNodePort: null
     externalPort: 8200
-    loadBalancerSourceRanges:
-       - < Your IP RANGE Ex. 10.0.0.0/16 >
-       - < YOUR SINGLE IP Ex. 1.78.23.3/32 >
+    # loadBalancerSourceRanges:
+    #   - < Your IP RANGE Ex. 10.0.0.0/16 >
+    #   - < YOUR SINGLE IP Ex. 1.78.23.3/32 >

@@ -29,10 +29,10 @@ global:
     # we need to define custom readiness/liveness Probe settings
     readinessProbe:
       enabled: true
-      path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+      path: "/v1/sys/health?perfstandbyok=true&sealedcode=204&uninitcode=204"
     livenessProbe:
       enabled: true
-      path: "/v1/sys/health?standbyok=true"
+      path: "/v1/sys/health?perfstandbyok=true"
       initialDelaySeconds: 60
   
     # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
@@ -119,7 +119,7 @@ global:
           
           seal "gcpckms" {
             credentials = "/vault/userconfig/kms-creds/credentials.json"            
-            project     = "jca-tfe-testing-1da3236b"
+            project     = "my-project"
             region      = "global"
             key_ring    = "vault-helm-unseal-kr"
             crypto_key  = "vault-helm-unseal-key"
@@ -133,6 +133,6 @@ global:
     serviceType: "LoadBalancer"
     serviceNodePort: null
     externalPort: 8200
-    loadBalancerSourceRanges:
-       - < Your IP RANGE Ex. 10.0.0.0/16 >
-       - < YOUR SINGLE IP Ex. 1.78.23.3/32 >
+    #loadBalancerSourceRanges:
+    #   - < Your IP RANGE Ex. 10.0.0.0/16 >
+    #   - < YOUR SINGLE IP Ex. 1.78.23.3/32 >
