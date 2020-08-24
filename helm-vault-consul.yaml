@@ -38,9 +38,10 @@ global:
     # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
     # used to include variables required for auto-unseal.
     extraEnvironmentVars:
-       GOOGLE_REGION: global
-       GOOGLE_PROJECT: my-project
-       GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/kms-creds/credentials.json
+       VAULT_CACERT: "/vault/userconfig/tls-test-ca/ca.crt"
+       GOOGLE_REGION: "global"
+       GOOGLE_PROJECT: "my-project"
+       GOOGLE_APPLICATION_CREDENTIALS: "/vault/userconfig/kms-creds/credentials.json"
   
     # extraVolumes is a list of extra volumes to mount. These will be exposed
     # to Vault in the path `/vault/userconfig/<name>/`. The value below is
